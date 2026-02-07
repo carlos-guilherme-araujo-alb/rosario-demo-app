@@ -1,12 +1,7 @@
-// sw.js — PWA Service Worker for GitHub Pages (static site)
-// Auto-versioned cache name + automatic cleanup of old caches
-
 const APP_PREFIX = "rosario-app-";
 const CACHE_NAME = APP_PREFIX + new Date().toISOString();
 
-// Add here any files you want available offline.
-// (If you add icons, include them too.)
-const ASSETS = [
+const CORE_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
@@ -17,10 +12,7 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-  // Activate the new SW as soon as it's installed
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)));
   self.skipWaiting();
 });
 
@@ -29,7 +21,6 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys.map((key) => {
-          // Delete old versions of our cache
           if (key.startsWith(APP_PREFIX) && key !== CACHE_NAME) {
             return caches.delete(key);
           }
@@ -37,20 +28,28 @@ self.addEventListener("activate", (event) => {
       )
     )
   );
-  // Control pages immediately
   self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
-  // Only handle GET requests
   if (event.request.method !== "GET") return;
 
-  // Network-first for HTML (ensures updates show up quickly)
-  const isHTML =
-    event.request.mode === "navigate" ||
-    (event.request.headers.get("accept") || "").includes("text/html");
+  const url = new URL(event.request.url);
+  const sameOrigin = url.origin === self.location.origin;
 
-  if (isHTML) {
+  const accept = event.request.headers.get("accept") || "";
+  const isHTML = event.request.mode === "navigate" || accept.includes("text/html");
+
+  const isHotAsset =
+    sameOrigin &&
+    (url.pathname.endsWith("/index.html") ||
+      url.pathname.endsWith("/app.js") ||
+      url.pathname.endsWith("/styles.css") ||
+      url.pathname.endsWith("/manifest.json") ||
+      url.pathname.endsWith("/sw.js"));
+
+  // Network first para HTML e ficheiros que mudam muito
+  if (isHTML || isHotAsset) {
     event.respondWith(
       fetch(event.request)
         .then((resp) => {
@@ -63,13 +62,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for static assets (fast + offline)
+  // Cache first para o resto (rápido + offline)
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
 
       return fetch(event.request).then((resp) => {
-        // Only cache valid responses
         if (!resp || resp.status !== 200 || resp.type === "opaque") return resp;
 
         const copy = resp.clone();
