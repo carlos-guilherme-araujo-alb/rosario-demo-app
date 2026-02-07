@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rosário App</title>
+
+    <meta name="theme-color" content="#2b6cff" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./icons/icon-192.png" />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <h1>Rosário App</h1>
+        <button id="darkToggle" class="chip" aria-label="Alternar modo escuro">🌙</button>
+      </header>
+
+      <main id="view" class="view"></main>
+
+      <nav class="tabbar" aria-label="Navegação">
+        <button class="tab active" data-tab="home">Início</button>
+        <button class="tab" data-tab="schedule">Horário</button>
+        <button class="tab" data-tab="cafeteria">Cantina</button>
+        <button class="tab" data-tab="events">Eventos</button>
+        <button class="tab" data-tab="reminders">Lembretes</button>
+      </nav>
+    </div>
+
+    <script src="./app.js"></script>
+    <script>
+      // Registo do Service Worker (PWA)
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js");
+        });
+      }
+    </script>
+  </body>
+</html>
