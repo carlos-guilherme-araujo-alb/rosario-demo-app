@@ -1,7 +1,14 @@
 const view = document.getElementById("view");
 const tabs = Array.from(document.querySelectorAll(".tab"));
+const tabbar = document.getElementById("tabbar");
 const darkToggle = document.getElementById("darkToggle");
+const logoutBtn = document.getElementById("logoutBtn");
 
+// Credenciais fake
+const FAKE_USER = "user";
+const FAKE_PASS = "password";
+
+// Dados demo
 const data = {
   schedule: [
     { time: "08:30", subject: "Matemática" },
@@ -39,6 +46,55 @@ function card(title, innerHtml) {
       ${innerHtml}
     </section>
   `;
+}
+
+function isAuthed() {
+  return localStorage.getItem("rosario_authed") === "1";
+}
+
+function setAuthed(value) {
+  localStorage.setItem("rosario_authed", value ? "1" : "0");
+}
+
+function showAppChrome() {
+  tabbar.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+}
+
+function hideAppChrome() {
+  tabbar.classList.add("hidden");
+  logoutBtn.classList.add("hidden");
+}
+
+function renderLogin(errorMsg = "") {
+  hideAppChrome();
+  view.innerHTML =
+    card("Iniciar sessão", `
+      <h2 style="margin:0 0 10px;">Bem-vindo 👋</h2>
+      <p style="margin:0 0 14px;color:var(--muted);">Usa as credenciais de demonstração para entrar.</p>
+
+      <div class="list">
+        <input id="loginUser" class="input" placeholder="Utilizador" autocomplete="username" />
+        <input id="loginPass" class="input" placeholder="Palavra-passe" type="password" autocomplete="current-password" />
+        <button id="loginBtn" class="btn">Entrar</button>
+      </div>
+
+      ${errorMsg ? `<div class="error">${errorMsg}</div>` : ""}
+      <div class="help">Credenciais: <strong>user</strong> / <strong>password</strong></div>
+    `);
+
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const u = document.getElementById("loginUser").value.trim();
+    const p = document.getElementById("loginPass").value;
+
+    if (u === FAKE_USER && p === FAKE_PASS) {
+      setAuthed(true);
+      showAppChrome();
+      setActive("home");
+    } else {
+      renderLogin("Credenciais inválidas. Tenta: user / password");
+    }
+  });
 }
 
 function renderHome() {
@@ -102,11 +158,24 @@ function setActive(tabName) {
   renderers[tabName]();
 }
 
-tabs.forEach(t => t.addEventListener("click", () => setActive(t.dataset.tab)));
+tabs.forEach(t => t.addEventListener("click", () => {
+  if (!isAuthed()) return;
+  setActive(t.dataset.tab);
+}));
 
 darkToggle.addEventListener("click", () => {
   const isDark = document.documentElement.getAttribute("data-theme") === "dark";
   document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
 });
 
-setActive("home");
+logoutBtn.addEventListener("click", () => {
+  setAuthed(false);
+  renderLogin();
+});
+
+if (isAuthed()) {
+  showAppChrome();
+  setActive("home");
+} else {
+  renderLogin();
+}
