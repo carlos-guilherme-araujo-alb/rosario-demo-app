@@ -49,12 +49,13 @@ function card(title, innerHtml) {
 }
 
 function isAuthed() {
-  return localStorage.getItem("rosario_authed") === "1";
+  return sessionStorage.getItem("rosario_authed") === "1";
 }
 
 function setAuthed(value) {
-  localStorage.setItem("rosario_authed", value ? "1" : "0");
+  sessionStorage.setItem("rosario_authed", value ? "1" : "0");
 }
+
 
 function showAppChrome() {
   tabbar.classList.remove("hidden");
