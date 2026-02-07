@@ -1,6 +1,6 @@
 const APP_PREFIX = "rosario-app-";
-const CACHE_NAME = APP_PREFIX + new Date().toISOString();
-
+const VERSION = "v2.0";
+const CACHE_NAME = APP_PREFIX + VERSION;
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -12,7 +12,9 @@ const CORE_ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
+  );
   self.skipWaiting();
 });
 
@@ -36,19 +38,17 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
   const sameOrigin = url.origin === self.location.origin;
-
   const accept = event.request.headers.get("accept") || "";
   const isHTML = event.request.mode === "navigate" || accept.includes("text/html");
+  const isHotAsset = sameOrigin && (
+    url.pathname.endsWith("/index.html") ||
+    url.pathname.endsWith("/app.js") ||
+    url.pathname.endsWith("/styles.css") ||
+    url.pathname.endsWith("/manifest.json") ||
+    url.pathname.endsWith("/sw.js")
+  );
 
-  const isHotAsset =
-    sameOrigin &&
-    (url.pathname.endsWith("/index.html") ||
-      url.pathname.endsWith("/app.js") ||
-      url.pathname.endsWith("/styles.css") ||
-      url.pathname.endsWith("/manifest.json") ||
-      url.pathname.endsWith("/sw.js"));
-
-  // Network first para HTML e ficheiros que mudam muito
+  // Network first for HTML and frequently changing files
   if (isHTML || isHotAsset) {
     event.respondWith(
       fetch(event.request)
@@ -62,14 +62,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache first para o resto (rápido + offline)
+  // Cache first for everything else
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
-
       return fetch(event.request).then((resp) => {
         if (!resp || resp.status !== 200 || resp.type === "opaque") return resp;
-
         const copy = resp.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return resp;

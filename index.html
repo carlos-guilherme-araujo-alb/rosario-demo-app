@@ -1,48 +1,44 @@
 <!doctype html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Rosário App</title>
-
-    <meta name="theme-color" content="#2b6cff" />
-    <link rel="manifest" href="./manifest.json" />
-
-    <link rel="icon" href="./icons/icon-192.png" />
-    <link rel="icon" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="icon" sizes="512x512" href="./icons/icon-512.png" />
-    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <div class="app">
-      <header class="topbar">
-        <h1>Rosário App</h1>
-        <div class="top-actions">
-          <button id="logoutBtn" class="chip hidden" aria-label="Terminar sessão">Sair</button>
-          <button id="darkToggle" class="chip" aria-label="Alternar modo escuro">🌙</button>
-        </div>
-      </header>
-
-      <main id="view" class="view"></main>
-
-      <nav id="tabbar" class="tabbar hidden" aria-label="Navegação">
-        <button class="tab active" data-tab="home">Início</button>
-        <button class="tab" data-tab="schedule">Horário</button>
-        <button class="tab" data-tab="cafeteria">Cantina</button>
-        <button class="tab" data-tab="events">Eventos</button>
-        <button class="tab" data-tab="reminders">Lembretes</button>
-      </nav>
-    </div>
-
-    <script src="./app.js"></script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./sw.js");
-        });
-      }
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Rosário App</title>
+  <meta name="description" content="App do Colégio do Rosário — horários, cantina, notas e eventos." />
+  <meta name="theme-color" content="#1a3a6b" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <noscript><style>.app{display:none}</style><p style="padding:40px;text-align:center;font-family:sans-serif;">Esta app precisa de JavaScript ativado.</p></noscript>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="header" id="header">
+      <span class="header-brand">Rosário</span>
+      <div class="header-actions">
+        <button class="icon-btn" id="msgBtn" aria-label="Mensagens">
+          ✉️<span class="notif-dot hidden" id="notifDot"></span>
+        </button>
+      </div>
+    </header>
+    <main class="main" id="view"></main>
+    <nav class="tabbar hidden" id="tabbar" aria-label="Navegação">
+      <button class="tab-item active" data-tab="home"><span class="tab-icon">🏠</span>Início</button>
+      <button class="tab-item" data-tab="schedule"><span class="tab-icon">📅</span>Horário</button>
+      <button class="tab-item" data-tab="cafeteria"><span class="tab-icon">🍽</span>Cantina</button>
+      <button class="tab-item" data-tab="grades"><span class="tab-icon">📊</span>Notas</button>
+      <button class="tab-item" data-tab="profile"><span class="tab-icon">👤</span>Perfil</button>
+    </nav>
+  </div>
+  <script src="./app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
+    }
+  </script>
+</body>
 </html>
