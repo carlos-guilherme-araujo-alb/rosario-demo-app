@@ -8,6 +8,14 @@ const logoutBtn = document.getElementById("logoutBtn");
 const FAKE_USER = "user";
 const FAKE_PASS = "password";
 
+// Guardar login só na sessão (quando fechas o separador, volta a pedir login)
+function isAuthed() {
+  return sessionStorage.getItem("rosario_authed") === "1";
+}
+function setAuthed(value) {
+  sessionStorage.setItem("rosario_authed", value ? "1" : "0");
+}
+
 // Dados demo
 const data = {
   schedule: [
@@ -48,15 +56,6 @@ function card(title, innerHtml) {
   `;
 }
 
-function isAuthed() {
-  return sessionStorage.getItem("rosario_authed") === "1";
-}
-
-function setAuthed(value) {
-  sessionStorage.setItem("rosario_authed", value ? "1" : "0");
-}
-
-
 function showAppChrome() {
   tabbar.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
@@ -69,24 +68,28 @@ function hideAppChrome() {
 
 function renderLogin(errorMsg = "") {
   hideAppChrome();
-  view.innerHTML =
-    card("Iniciar sessão", `
-      <h2 style="margin:0 0 10px;">Bem-vindo 👋</h2>
-      <p style="margin:0 0 14px;color:var(--muted);">Usa as credenciais de demonstração para entrar.</p>
 
-      <div class="list">
-        <input id="loginUser" class="input" placeholder="Utilizador" autocomplete="username" />
-        <input id="loginPass" class="input" placeholder="Palavra-passe" type="password" autocomplete="current-password" />
-        <button id="loginBtn" class="btn">Entrar</button>
-      </div>
+  view.innerHTML = card("Iniciar sessão", `
+    <h2 style="margin:0 0 10px;">Bem-vindo 👋</h2>
+    <p style="margin:0 0 14px;color:var(--muted);">Usa as credenciais de demonstração para entrar.</p>
 
-      ${errorMsg ? `<div class="error">${errorMsg}</div>` : ""}
-      <div class="help">Credenciais: <strong>user</strong> / <strong>password</strong></div>
-    `);
+    <div class="list">
+      <input id="loginUser" class="input" placeholder="Utilizador" autocomplete="username" />
+      <input id="loginPass" class="input" placeholder="Palavra-passe" type="password" autocomplete="current-password" />
+      <button id="loginBtn" class="btn">Entrar</button>
+    </div>
 
-  document.getElementById("loginBtn").addEventListener("click", () => {
-    const u = document.getElementById("loginUser").value.trim();
-    const p = document.getElementById("loginPass").value;
+    ${errorMsg ? `<div class="error">${errorMsg}</div>` : ""}
+    <div class="help">Credenciais: <strong>user</strong> / <strong>password</strong></div>
+  `);
+
+  const userEl = document.getElementById("loginUser");
+  const passEl = document.getElementById("loginPass");
+  const btnEl = document.getElementById("loginBtn");
+
+  function tryLogin() {
+    const u = userEl.value.trim();
+    const p = passEl.value;
 
     if (u === FAKE_USER && p === FAKE_PASS) {
       setAuthed(true);
@@ -95,12 +98,28 @@ function renderLogin(errorMsg = "") {
     } else {
       renderLogin("Credenciais inválidas. Tenta: user / password");
     }
+  }
+
+  btnEl.addEventListener("click", tryLogin);
+
+  // Enter para submeter
+  passEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryLogin();
   });
+  userEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryLogin();
+  });
+
+  // Foco inicial
+  userEl.focus();
 }
 
 function renderHome() {
   view.innerHTML =
-    card("Bem-vindo", `<h2 style="margin:0 0 6px;">Olá 👋</h2><p style="margin:0;color:var(--muted);">Esta é a tua Rosário App. Usa o menu para navegar.</p>`) +
+    card("Bem-vindo", `
+      <h2 style="margin:0 0 6px;">Olá 👋</h2>
+      <p style="margin:0;color:var(--muted);">Esta é a tua Rosário App. Usa o menu para navegar.</p>
+    `) +
     card("Atalhos", `
       <div class="list">
         <div class="row"><span>Horário de hoje</span><span class="badge">Ver</span></div>
@@ -114,7 +133,9 @@ function renderHome() {
 function renderSchedule() {
   view.innerHTML = card("Horário", `
     <div class="list">
-      ${data.schedule.map(x => `<div class="row"><span>${x.subject}</span><span class="badge">${x.time}</span></div>`).join("")}
+      ${data.schedule
+        .map(x => `<div class="row"><span>${x.subject}</span><span class="badge">${x.time}</span></div>`)
+        .join("")}
     </div>
   `);
 }
@@ -133,7 +154,9 @@ function renderCafeteria() {
 function renderEvents() {
   view.innerHTML = card("Eventos", `
     <div class="list">
-      ${data.events.map(e => `<div class="row"><span>${e.title}</span><span class="badge">${e.date}</span></div>`).join("")}
+      ${data.events
+        .map(e => `<div class="row"><span>${e.title}</span><span class="badge">${e.date}</span></div>`)
+        .join("")}
     </div>
   `);
 }
@@ -141,7 +164,9 @@ function renderEvents() {
 function renderReminders() {
   view.innerHTML = card("Lembretes", `
     <div class="list">
-      ${data.reminders.map(r => `<div class="row"><span>${r.subject}</span><span class="badge">até ${r.due}</span></div>`).join("")}
+      ${data.reminders
+        .map(r => `<div class="row"><span>${r.subject}</span><span class="badge">até ${r.due}</span></div>`)
+        .join("")}
     </div>
   `);
 }
@@ -159,10 +184,12 @@ function setActive(tabName) {
   renderers[tabName]();
 }
 
-tabs.forEach(t => t.addEventListener("click", () => {
-  if (!isAuthed()) return;
-  setActive(t.dataset.tab);
-}));
+tabs.forEach(t =>
+  t.addEventListener("click", () => {
+    if (!isAuthed()) return;
+    setActive(t.dataset.tab);
+  })
+);
 
 darkToggle.addEventListener("click", () => {
   const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -174,6 +201,7 @@ logoutBtn.addEventListener("click", () => {
   renderLogin();
 });
 
+// Arranque
 if (isAuthed()) {
   showAppChrome();
   setActive("home");
