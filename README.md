@@ -1,5 +1,6 @@
 # Rosário Mobile 📱
 
+
 **Aplicação PWA para alunos do Colégio Nossa Senhora do Rosário, Porto**
 
 Uma Progressive Web App moderna e funcional para os alunos do Colégio do Rosário consultarem as suas informações académicas, horários, notas, comunicados e muito mais.
