@@ -52,8 +52,8 @@ A aplicação suporta **Português** e **Inglês** completos. Pode trocar o idio
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/SEU_USER/rosario-mobile.git
-cd rosario-mobile
+git clone https://github.com/SEU_USER/rosario-demo-app.git
+cd rosario-demo-app
 
 # Instalar dependências
 npm install
@@ -62,14 +62,14 @@ npm install
 npm run dev
 ```
 
-Abrir `http://localhost:5173/rosario-mobile/` no browser.
+Abrir `http://localhost:5173/rosario-demo-app/` no browser.
 
 ## 🚀 Deploy no GitHub Pages
 
 ### Automático (GitHub Actions)
 1. Fazer push para a branch `main`
 2. O workflow `.github/workflows/deploy.yml` é executado automaticamente
-3. A app fica disponível em `https://SEU_USER.github.io/rosario-mobile/`
+3. A app fica disponível em `https://SEU_USER.github.io/rosario-demo-app/`
 
 ### Manual
 ```bash

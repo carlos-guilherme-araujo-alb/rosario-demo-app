@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/rosario-mobile/service-worker.js')
+      .register('/rosario-demo-app/service-worker.js')
       .then((reg) => console.log('SW registered:', reg.scope))
       .catch((err) => console.log('SW registration failed:', err));
   });

@@ -1,9 +1,9 @@
 const CACHE_NAME = 'rosario-mobile-v1';
 const urlsToCache = [
-  '/rosario-mobile/',
-  '/rosario-mobile/index.html',
-  '/rosario-mobile/manifest.json',
-  '/rosario-mobile/favicon.svg',
+  '/rosario-demo-app/',
+  '/rosario-demo-app/index.html',
+  '/rosario-demo-app/manifest.json',
+  '/rosario-demo-app/favicon.svg',
 ];
 
 self.addEventListener('install', (event) => {
@@ -39,7 +39,7 @@ self.addEventListener('fetch', (event) => {
           cache.put(event.request, responseToCache);
         });
         return fetchResponse;
-      }).catch(() => caches.match('/rosario-mobile/index.html'));
+      }).catch(() => caches.match('/rosario-demo-app/index.html'));
     })
   );
 });

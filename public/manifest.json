@@ -2,7 +2,7 @@
   "name": "Colégio do Rosário - App do Aluno",
   "short_name": "Rosário",
   "description": "Aplicação móvel para alunos do Colégio Nossa Senhora do Rosário, Porto",
-  "start_url": "/rosario-mobile/",
+  "start_url": "/rosario-demo-app/",
   "display": "standalone",
   "background_color": "#FFFFFF",
   "theme_color": "#003366",
